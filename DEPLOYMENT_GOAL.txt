@@ -1,0 +1,140 @@
+PROJECT DEPLOYMENT GOAL AND IMPLEMENTATION BRIEF
+
+Purpose
+=======
+I want to make this project available as a secure, reliable web application.
+Other people should be able to open a web link and use it in a browser. They
+should not need to download the source code, install Python, install Ollama,
+or run commands on their computers.
+
+The app should continue to support the workflows I use now, including AI
+content generation, OpenCart product automation, bulk CSV/XLSX uploading, and
+the product SEO URL list. Product uploads happen on the server using the
+OpenCart account configured by the owner.
+
+User experience
+===============
+- The owner deploys and maintains the application.
+- Users visit a public or invited-user HTTPS link and use the existing web UI.
+- Users do not receive the source code or server credentials.
+- User access must be protected. Do not expose a link that lets anyone trigger
+  OpenCart automation.
+- The app should clearly report upload progress and whether products were
+  actually saved, as it does in the current workflow.
+
+Current project facts to verify in the repository
+=================================================
+- The project is a Python FastAPI application with a browser UI and Playwright
+  automation. See app/main.py, app/automation, app/routes, and app/templates.
+- Product operations run from the application server and log in to the
+  configured OpenCart admin site.
+- AI can use Ollama or an OpenAI-compatible provider. Ollama must be reachable
+  by the server-side app; a user's local Ollama installation will not be
+  available to a hosted app.
+- The sample environment file is .env.example. It contains example settings,
+  not production secrets. Real credentials and API keys must be supplied
+  through the hosting platform's secret/environment-variable mechanism, never
+  committed to Git or included in this brief.
+- Product saving is disabled by default (DRY_RUN=true and AUTO_SAVE=false).
+  Preserve safe defaults until production behavior has been tested and the
+  owner explicitly enables real saving.
+- The app currently records a product SEO URL in all_seo_urls.json only after
+  OpenCart reports a successful save. The bulk-upload workflow uses the same
+  automation workflow. Failed uploads and dry runs must not be recorded as
+  successful saves.
+- The SEO JSON path is currently fixed relative to the project root in
+  app/services/seo_urls.py. The current all_seo_urls.json is not necessarily
+  included in a Git deployment. Deployment must preserve existing entries and
+  persist future updates across restarts, redeploys, and server replacements.
+- The SEO JSON update currently reads and rewrites the file. Concurrent uploads
+  could race and lose entries. Assess this before allowing simultaneous users
+  or multiple app instances; use a serialized write or a persistent database
+  with uniqueness/transaction handling if appropriate.
+- The SQLite database and uploaded bulk files are stored on local paths. Check
+  every generated, uploaded, and operational file path and ensure data that
+  must survive a restart is on persistent storage.
+- The app currently defaults to a loopback host and a visible browser.
+  Production hosting will need an appropriate server bind address, a headless
+  browser configuration, and a deployment setup that installs compatible
+  Playwright browser dependencies.
+- A large Ollama installer, Python virtual environments, and local generated
+  or data files should not be committed as application source. Install
+  dependencies during deployment and keep runtime data on persistent storage.
+
+Deployment expectations
+=======================
+1. Inspect the repository, current Git status, README, environment settings,
+   routes, automation, file writes, and existing tests before changing code.
+2. Recommend a deployment target suited to a persistent Python web app that
+   runs Playwright and may use Ollama. A Linux VPS is an acceptable starting
+   point. Explain any infrastructure cost, limitations, and what the owner
+   must configure.
+3. Make the application deployable using a repeatable, documented process
+   (for example Docker plus a VPS/reverse proxy, or another justified setup).
+   Do not assume a static-site host or serverless function can run this
+   persistent browser automation.
+4. Serve the UI over HTTPS using a domain or subdomain. Keep internal app and
+   Ollama ports private; do not expose Ollama directly to the internet.
+5. Add or configure user authentication/access control before public sharing.
+   Consider the risk that users can invoke actions with the server's OpenCart
+   credentials. Do not store OpenCart credentials in browser code or return
+   them in API responses/logs.
+6. Store secrets outside Git using deployment secrets/environment variables.
+   Provide a safe production configuration example that contains placeholders
+   only. Never print or copy any real local .env values.
+7. Provide persistent storage for all_seo_urls.json (or a suitable database
+   replacement), SQLite data, and any uploaded files that users must resume or
+   download. Preserve the existing SEO URL entries during migration. Ensure
+   writes are atomic and safe under the intended number of concurrent workers.
+8. Configure Playwright to run headlessly in the production environment.
+   Verify that browser dependencies, timeouts, and shutdown behavior are
+   appropriate for the hosting target.
+9. Choose and document the AI approach. If using Ollama, explain how to install
+   and run the model on the server, configure the app to reach it, and persist
+   model data. If using a hosted AI provider, explain where to configure its
+   secret key and likely usage costs. Do not require end users to install AI
+   software.
+10. Keep real OpenCart saves disabled during initial deployment. Give the
+    owner a safe test procedure and require explicit owner action before
+    enabling production saves.
+11. Update deployment/user documentation with clear owner-only setup steps,
+    configuration variables, backup/restore guidance, deployment/update
+    procedure, and user access instructions. Do not expose private operational
+    details to public users.
+12. Run relevant tests and deployment checks. Add tests for persistence and
+    SEO URL recording as appropriate. Confirm a successful save records a URL,
+    a failed save or dry run does not, and stored URLs survive an app restart.
+    Report checks that could not be completed because they require live
+    OpenCart credentials, a cloud account, DNS, or other owner-only access.
+
+Non-goals and safeguards
+========================
+- Do not commit .env files, passwords, API keys, session cookies, or private
+  OpenCart data.
+- Do not upload virtual environments, installers, browser binaries, databases,
+  logs, screenshots, temporary files, or generated customer/product data to
+  GitHub unless there is a specific reviewed reason.
+- Do not enable unattended product saving or publicly expose admin automation
+  without the owner's confirmation and access control.
+- Do not remove existing SEO URL data or silently reset the database during
+  deployment.
+- Do not rewrite Git history, delete local files, or discard uncommitted work
+  without first explaining the risk and getting the owner's approval.
+- Preserve existing application behavior unless a change is needed for secure,
+  reliable deployment. Keep changes focused and explain behavior changes.
+
+Expected deliverables
+=====================
+- A concise recommendation for the deployment architecture and why it fits.
+- The necessary application and deployment changes, after inspecting the
+  current repository and preserving existing work.
+- A tested, repeatable deployment process and updated documentation.
+- A clear list of owner-only actions still required, such as creating a VPS,
+  configuring DNS, setting secrets, installing/configuring Ollama or an AI
+  provider, and testing OpenCart access.
+- A final explanation of how users access the app, where shared SEO data is
+  stored, how it is backed up, and how successful uploads update it.
+
+Start by inspecting the current repository and reporting any deployment
+blockers or important risks. Do not assume a cloud account, domain, server,
+credentials, budget, or permission to enable real product saves.

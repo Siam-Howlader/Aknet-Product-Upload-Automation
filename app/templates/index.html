@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="/static/style.css?v=3">
+</head>
+<body>
+  <main class="container">
+    <h1>AI OpenCart Product Uploader</h1>
+
+    <section class="card">
+      <h2>Global Brand Product URL Index</h2>
+      <p>Discover product names and product-page URLs from the Global Brand catalog.</p>
+      <div class="actions">
+        <button id="buildCatalogIndexBtn">Build / Refresh Product URL JSON</button>
+      </div>
+      <progress id="catalogIndexProgress" value="0" max="100"></progress>
+      <div id="catalogIndexStatus" class="bulk-progress" aria-live="polite">Ready</div>
+    </section>
+
+    <section class="card">
+      <h2>Update Product CSV from Global Brand</h2>
+      <p>Upload a CSV to match products from the saved Global Brand URL JSON and update verified product fields.</p>
+      <label for="csvUpdateFile">Product CSV</label>
+      <input id="csvUpdateFile" type="file" accept=".csv,text/csv">
+      <p id="csvUpdateFileStatus">No file selected.</p>
+      <div class="actions">
+        <button id="startCsvUpdateBtn" disabled>Update CSV</button>
+        <a id="downloadCsvUpdate" class="button-link" hidden>Download Updated CSV</a>
+      </div>
+      <progress id="csvUpdateProgress" value="0" max="100"></progress>
+      <div id="csvUpdateStatus" class="bulk-progress" aria-live="polite">Ready</div>
+    </section>
+
+    <section class="card">
+      <h2>Bulk Upload from CSV or XLSX</h2>
+      <p>Upload a CSV or XLSX file with the required product columns. Each new upload starts from the selected file; use <code>Resume Saved Queue</code> to continue a previous batch. Rows marked <code>pending</code> are processed in order, and rows marked <code>succeed</code> are skipped.</p>
+      <label for="bulkCsvFile">CSV or XLSX file</label>
+      <input id="bulkCsvFile" type="file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+      <div class="actions">
+        <button id="bulkUploadBtn">Start Bulk Upload</button>
+        <button id="resumeBulkBtn" class="secondary" hidden>Resume Saved Queue</button>
+        <a id="downloadBulkCsv" class="button-link" hidden>Download Updated File</a>
+      </div>
+      <div id="bulkProgress" class="bulk-progress" aria-live="polite">
+        <p id="bulkProgressText">No bulk upload running.</p>
+        <p>Current product: <strong id="bulkCurrentProduct">—</strong></p>
+        <p>Successful: <strong id="bulkSuccessful">0</strong> · Pending/failed: <strong id="bulkPending">0</strong></p>
+      </div>
+      <div id="bulkRows" class="bulk-rows" aria-live="polite"></div>
+    </section>
+
+    <section class="card">
+      <label for="productName">Product Name</label>
+      <input id="productName" type="text" placeholder="A4TECH OP-730D 2X Click wired optical mouse" />
+      <div class="actions">
+        <button id="generateBtn">Generate Product</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Generated Product Information</h2>
+      <label for="genProductName">Product Name</label>
+      <input id="genProductName" type="text" />
+
+      <label for="description">Description</label>
+      <textarea id="description" rows="8"></textarea>
+
+      <label for="metaTitle">Meta Title</label>
+      <input id="metaTitle" type="text" />
+
+      <label for="metaDescription">Meta Description</label>
+      <textarea id="metaDescription" rows="4"></textarea>
+
+      <label for="metaKeywords">Meta Keywords</label>
+      <textarea id="metaKeywords" rows="3"></textarea>
+
+      <label for="productTags">Product Tags</label>
+      <input id="productTags" type="text" />
+
+      <label for="price">Price</label>
+      <input id="price" type="number" min="0" step="0.01" placeholder="0" />
+
+      <label for="model">Model</label>
+      <input id="model" type="text" placeholder="AI-generated exact model/code" />
+
+      <label for="manufacturer">Manufacturer</label>
+      <input id="manufacturer" type="text" placeholder="Asus" />
+
+      <label for="categories">Categories</label>
+      <input id="categories" type="text" placeholder="Laptop, Gaming Laptop, ASUS" />
+
+      <label for="filters">Filters</label>
+      <input id="filters" type="text" placeholder="RGB, Wireless, Ergonomic" />
+
+      <label for="keyAttributes">Top 5 Key Attributes</label>
+      <div id="keyAttributes" class="specifications-list"></div>
+
+      <label for="specifications">Scraped Specifications</label>
+      <div class="specification-headings" aria-hidden="true">
+        <span>Attribute Name</span>
+        <span>Attribute Result</span>
+      </div>
+      <div id="specifications" class="specifications-list"></div>
+
+      <div class="actions two">
+        <button id="regenerateBtn" class="secondary">Regenerate</button>
+        <button id="uploadBtn">Upload to OpenCart</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Job History</h2>
+      <button id="refreshHistoryBtn" class="secondary">Refresh History</button>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+    <section class="card status" id="statusBox">Ready.</section>
+  </main>
+  <script src="/static/app.js?v=11"></script>
+</body>
+</html>

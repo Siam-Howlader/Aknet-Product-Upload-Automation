@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [{
+        "name": "Python: Run app",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/run.py",
+        "console": "integratedTerminal",
+        "cwd": "${workspaceFolder}",
+        "env": {
+            "APP_PORT": "8010",
+            "APP_HOST": "127.0.0.1"
+        },
+        "justMyCode": true,
+        "python": "${workspaceFolder}\\.venv312\\Scripts\\python.exe"
+    }]
+}

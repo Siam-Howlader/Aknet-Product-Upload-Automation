@@ -1,0 +1,16 @@
+.venv/
+.venv312/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.env
+debug/screenshots/
+app/static/images/
+data/
+!data/mave/
+!data/mave/processed/
+!data/mave/processed/.gitkeep
+data/mave/raw/
